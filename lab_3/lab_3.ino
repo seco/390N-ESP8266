@@ -5,9 +5,9 @@ void play_note(int freq){
   if (freq > 0){
     analogWrite(PIN_BUZZER, 512);
     analogWriteFreq(freq);
-    } else {
-      analogWrite(PIN_BUZZER, 0);
-    }
+  } else {
+    analogWrite(PIN_BUZZER, 0);
+  }
 }
 
 void setup() {
@@ -17,5 +17,10 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
+  play_note(NOTE_E3);
+  play_note(NOTE_A3);
+  play_note(NOTE_D3);
   play_note(NOTE_G3);
+  play_note(NOTE_B3);
+  play_note(NOTE_C3);
 }
