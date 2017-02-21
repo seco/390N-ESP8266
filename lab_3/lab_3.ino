@@ -18,20 +18,34 @@ void setup() {
 void loop() {
   // put your main code here, to run repeatedly:
 
-  // riff
-  play_note(NOTE_DS7);
-  delay(100);
-  play_note(NOTE_D5);
-  delay(100);
-  play_note(NOTE_D4);
-  delay(100);
-  play_note(NOTE_D0);
-  delay(70);
+  play_note(NOTE_B13);
+  delay(300);
+  play_note(NOTE_B13);
+  delay(300);
+  play_note(NOTE_B13);
+  delay(300);
+  play_note(NOTE_B13);
+  delay(300);
 
-  play_note(NOTE_A5);
-  delay(70);
-  play_note(NOTE_A4);
-  delay(70);
-  play_note(NOTE_A0);
-  delay(70);
+  play_note(NOTE_B9);
+  delay(550);
+ 
+  play_note(NOTE_B9);
+  delay(550);
+  play_note(NOTE_B11);
+  delay(550);
+
+  play_note(NOTE_B13);
+  delay(200);
+  play_note(NOTE_B11);
+  delay(200);
+  play_note(NOTE_B13);
+  delay(500);
+  
+  
+
+
+
+
+  
 }
