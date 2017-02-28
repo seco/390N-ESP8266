@@ -27,12 +27,12 @@ void setup() {
   secondTick.attach(1, ISRwatchdog); //registering the watchdog ISR
   pinMode(PIN_BUZZER, OUTPUT);
 
-  int prevFreq = EEPROM.read(EEPROM_Addr); // read previous frequency
-  if (prevFreq != 255){
+  int prevFreqIndex = EEPROM.read(EEPROM_Addr); // read previous frequency
+  if (prevFreqIndex != 255){
     Serial.println("Previous frequency found : ");
-    Serial.println(prevFreq);
+    Serial.println(freq[prevFreqIndex]);
     analogWrite(PIN_BUZZER, 256);
-    analogWriteFreq(prevFreq);
+    analogWriteFreq(freq[prevFreqIndex]);
     delay(1000);
   }
 }
@@ -42,11 +42,12 @@ void loop() {
   Serial.println(watchdogCount);
   watchdogCount = 0;
 
-  int freq = freqs[random(0, 11)];
+  int freqIndex = random(0, 11);
+  int freq = freqs[freqIndex];
   Serial.print("Frequency: ");
   Serial.println(freq);
   Serial.println("Saving to EEPROM");
-  EEPROM.write(EEPROM_Addr, freq);
+  EEPROM.write(EEPROM_Addr, freqIndex);
   EEPROM.commit();
   
   // generating 50% PWM
