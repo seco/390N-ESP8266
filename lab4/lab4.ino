@@ -11,6 +11,7 @@
 // create pixel object
 Adafruit_NeoPixel pixel = Adafruit_NeoPixel(1, PIN_LED, NEO_GRB + NEO_KHZ800);
 ESP8266WebServer server(80);
+WiFiClient client;
 
 void on_homepage(){
   String html = FPSTR(html_homepage);
@@ -25,11 +26,26 @@ void setup() {
   String ap_name = "Group 14";
   WiFi.softAP(ap_name.c_str());
 
+  while (WiFi.status() != WL_CONNECTED){
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("Connected");
+  
+
   server.on("/", on_homepage);
   server.begin();
 }
 
 void loop() {
-  server.handleClient();
+  if (client){ // wait for client to connect
+    Serial.println("Client connected");
+    while (client.connected()){
+      if (client.available()){
+        String line = client.readStringUntil('\r');
+        Serial.println(line);
+      }
+    }
+  }
 }
 
