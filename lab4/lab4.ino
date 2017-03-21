@@ -15,6 +15,13 @@ WiFiClient client;
 
 void on_homepage(){
   String html = FPSTR(html_homepage);
+  if (server.hasArg("r") && server.hasArg("g") && server.hasArg("b")){
+     pixel.setPixelColor(0, pixel.Color(
+      server.arg("r").toInt(), 
+      server.arg("r").toInt(), 
+      server.arg("r").toInt()
+     ));
+  }
   server.send(200, "text/html", html);
 }
 
@@ -32,20 +39,12 @@ void setup() {
   }
   Serial.println("Connected");
   
-
+  // render homepage on GET request to /
   server.on("/", on_homepage);
   server.begin();
 }
 
 void loop() {
-  if (client){ // wait for client to connect
-    Serial.println("Client connected");
-    while (client.connected()){
-      if (client.available()){
-        String line = client.readStringUntil('\r');
-        Serial.println(line);
-      }
-    }
-  }
+  server.handleClient();
 }
 
