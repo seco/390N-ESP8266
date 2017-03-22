@@ -30,9 +30,9 @@ void setup() {
   int prevFreqIndex = EEPROM.read(EEPROM_Addr); // read previous frequency
   if (prevFreqIndex != 255){
     Serial.println("Previous frequency found : ");
-    Serial.println(freq[prevFreqIndex]);
+    Serial.println(freqs[prevFreqIndex]);
     analogWrite(PIN_BUZZER, 256);
-    analogWriteFreq(freq[prevFreqIndex]);
+    analogWriteFreq(freqs[prevFreqIndex]);
     delay(1000);
   }
 }

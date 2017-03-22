@@ -1,4 +1,3 @@
-const char html_homepage[] PROGMEM = R"(
 <html>
 <head>
 <title>CS390N Lab 4 Exercise</title>
@@ -65,14 +64,16 @@ table {
         var xhr = new XMLHttpRequest();
         xhr.open('GET', rgb2cc(div.style.backgroundColor), true);
         xhr.send(null);
+		    console.log("HTTP request sent to " + rgb2cc(div.style.backgroundColor));
         event.preventDefault();
-      } 
-      div.addEventListener('click', click);      
+      }
+      div.addEventListener('click', click);
     });
-    function loadValues() {
+    function loadValues() {                                                                                                                                                                                                                                                                                                                                                    
       var xhr=new XMLHttpRequest();
       xhr.onreadystatechange=function() {
         if(xhr.readyState==4 && xhr.status==200) {
+          console.log("Received HTTP request " + xhr.responseText);
           var jd=JSON.parse(xhr.responseText);
           id('lbl_lit').innerHTML=jd.light;
           id('lbl_but').innerHTML=(jd.button)?'pressed':'released';
@@ -85,4 +86,3 @@ table {
   </script>
 </body>
 </html>
-)";
