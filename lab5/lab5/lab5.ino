@@ -1,5 +1,10 @@
 #include <ESP8266WiFi.h>
+#include <WiFiClient.h>
+#include <Temboo.h>
+#include "TembooAccount.h"
+#include <TimeLib.h>
 #include <BlynkSimpleEsp8266.h>
+WiFiClient client;
 
 // Define different pins
 #define PIN_BUTTON 0
@@ -33,12 +38,12 @@ char password[] = "00000000";
 
 // If user turns off the alarm
 BLYNK_WRITE(V1){
-  alarm = 2;
   turnOffAlarm();
 }
 
 // User turns off the system
 BLYNK_WRITE(V2){
+  //updateSpreadsheet("System turned off");
   systemOn = false;
   alarm = 2;
   turnOffAlarm();
@@ -46,9 +51,9 @@ BLYNK_WRITE(V2){
 
 // User turns on the system
 BLYNK_WRITE(V5){
+  //updateSpreadsheet("System turned on");
   systemOn = true;
   alarm = 0;
-  turnOffAlarm();
 }
 
 // Generates a sound and blinks the LED every second
@@ -71,8 +76,10 @@ void soundAlarm(){
 
 // Turns off the LED and the buzzer
 void turnOffAlarm(){
+  //updateSpreadsheet("Alarm turned off");
   digitalWrite(LED, HIGH);
   analogWrite(PIN_BUZZER, 0);
+  alarm = 2;
 }
 
 // Update status of alarm and system on Blynk
@@ -106,6 +113,49 @@ void sendStatusToBlynk(){
   Blynk.virtualWrite(V6, status);
 }
 
+//void updateSpreadsheet(String data){
+// TembooChoreo AppendValuesChoreo(client);
+//
+//  // Invoke the Temboo client
+//  AppendValuesChoreo.begin();
+//
+//  // Set Temboo account credentials
+//  AppendValuesChoreo.setAccountName(TEMBOO_ACCOUNT);
+//  AppendValuesChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+//  AppendValuesChoreo.setAppKey(TEMBOO_APP_KEY);
+//
+//  time_t t = now();
+//  String timeData = (String) month(t) + 
+//                    "-" + 
+//                    (String) day(t) + 
+//                    "-" + 
+//                    (String) year(t) + 
+//                    " " + 
+//                    (String) hour(t) + 
+//                    ":" + 
+//                    (String) minute(t);
+//
+//  String values = "[[" + timeData + ", " + data + "]]";
+//  
+//  // Set Choreo inputs
+//  AppendValuesChoreo.addInput("RefreshToken", REFRESH_TOKEN);
+//  AppendValuesChoreo.addInput("ClientSecret", CLIENT_SECRET);
+//  AppendValuesChoreo.addInput("Values", values);
+//  AppendValuesChoreo.addInput("ClientID", CLIENT_ID);
+//  AppendValuesChoreo.addInput("SpreadsheetID", SPREADSHEET_ID);
+//  
+//  // Identify the Choreo to run
+//  AppendValuesChoreo.setChoreo("/Library/Google/Sheets/AppendValues");
+//  
+//  // Run the Choreo; when results are available, print them to serial
+//  AppendValuesChoreo.run();
+//  
+//  while(AppendValuesChoreo.available()) {
+//    char c = AppendValuesChoreo.read();
+//    Serial.print(c);
+//  }
+//  AppendValuesChoreo.close();
+//}
 
 void setup() {
   Serial.begin(9600);
@@ -121,6 +171,8 @@ void setup() {
   Blynk.begin(auth, ssid, password);
   Blynk.virtualWrite(V0, "RUNNING");
   Blynk.virtualWrite(V3, "ON");
+
+  Serial.println("Setup complete");
 }
 
 void loop() {
@@ -141,6 +193,7 @@ void loop() {
     // if door opens and alarm was running
     if (doorOpen && alarm == 0){
       Serial.println("Door was opened");
+      //updateSpreadsheet("Alarm triggered");
       alarm = 1;
       Blynk.notify("Someone opened your door!");
       soundAlarm();
@@ -148,6 +201,7 @@ void loop() {
 
     // if door is closed and alarm was turned off by the user
     if (!doorOpen && alarm == 2){
+      //updateSpreadsheet("Door closed, alarm running");
       alarm = 0;
     }
   }
