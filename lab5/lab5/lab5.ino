@@ -27,7 +27,7 @@ long previousMillis = 0; // needed to track time for repeated buzzer & LED
 char auth[] = "af0f68df444b43edbcd37bc7147ab608";
 
 // Update these to whatever Wifi your phone is connected to
-char ssid[] = "Somnus";
+char ssid[] = "Catherine";
 char password[] = "00000000";
 
 // V0 -> Alarm status
@@ -39,14 +39,16 @@ char password[] = "00000000";
 // If user turns off the alarm
 BLYNK_WRITE(V1){
   turnOffAlarm();
+  alarm = 2;
+  // updateSpreadsheet("Alarm turned off");
 }
 
 // User turns off the system
 BLYNK_WRITE(V2){
-  //updateSpreadsheet("System turned off");
   systemOn = false;
   alarm = 2;
   turnOffAlarm();
+  //updateSpreadsheet("System turned off");
 }
 
 // User turns on the system
@@ -84,78 +86,88 @@ void turnOffAlarm(){
 
 // Update status of alarm and system on Blynk
 void sendStatusToBlynk(){
-  String status;
 
   // Alarm status
   if (alarm == 0){
-    status = "RUNNING";
+    Blynk.virtualWrite(V0, "RUNNING");
   } else if (alarm == 1){
-    status = "TRIGGERED";
+    Blynk.virtualWrite(V0, "TRIGGERED");
   } else {
-    status = "OFF";  
+    Blynk.virtualWrite(V0, "OFF");
   }
-  Blynk.virtualWrite(V0, status);
   
   // System status
   if (systemOn){
-    status = "ON";
+    Blynk.virtualWrite(V3, "ON");
   } else {
-    status = "OFF";
+    Blynk.virtualWrite(V3, "OFF");
   }
-  Blynk.virtualWrite(V3, status);
   
   // Door status
   if (doorOpen){
-    status = "DOOR OPEN";
+    Blynk.virtualWrite(V6, "DOOR OPEN");
   } else {
-    status = "DOOR CLOSED";
+    Blynk.virtualWrite(V6, "DOOR CLOSED");
   }
-  Blynk.virtualWrite(V6, status);
 }
 
-//void updateSpreadsheet(String data){
-// TembooChoreo AppendValuesChoreo(client);
-//
-//  // Invoke the Temboo client
-//  AppendValuesChoreo.begin();
-//
-//  // Set Temboo account credentials
-//  AppendValuesChoreo.setAccountName(TEMBOO_ACCOUNT);
-//  AppendValuesChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
-//  AppendValuesChoreo.setAppKey(TEMBOO_APP_KEY);
-//
-//  time_t t = now();
-//  String timeData = (String) month(t) + 
-//                    "-" + 
-//                    (String) day(t) + 
-//                    "-" + 
-//                    (String) year(t) + 
-//                    " " + 
-//                    (String) hour(t) + 
-//                    ":" + 
-//                    (String) minute(t);
-//
-//  String values = "[[" + timeData + ", " + data + "]]";
-//  
-//  // Set Choreo inputs
-//  AppendValuesChoreo.addInput("RefreshToken", REFRESH_TOKEN);
-//  AppendValuesChoreo.addInput("ClientSecret", CLIENT_SECRET);
-//  AppendValuesChoreo.addInput("Values", values);
-//  AppendValuesChoreo.addInput("ClientID", CLIENT_ID);
-//  AppendValuesChoreo.addInput("SpreadsheetID", SPREADSHEET_ID);
-//  
-//  // Identify the Choreo to run
-//  AppendValuesChoreo.setChoreo("/Library/Google/Sheets/AppendValues");
-//  
-//  // Run the Choreo; when results are available, print them to serial
-//  AppendValuesChoreo.run();
-//  
-//  while(AppendValuesChoreo.available()) {
-//    char c = AppendValuesChoreo.read();
-//    Serial.print(c);
-//  }
-//  AppendValuesChoreo.close();
-//}
+void updateSpreadsheet(String data){
+ TembooChoreo AppendValuesChoreo(client);
+ Serial.println("Beginning choreo");
+
+  // Invoke the Temboo client
+  AppendValuesChoreo.begin();
+
+  // Set Temboo account credentials
+  AppendValuesChoreo.setAccountName(TEMBOO_ACCOUNT);
+  AppendValuesChoreo.setAppKeyName(TEMBOO_APP_KEY_NAME);
+  AppendValuesChoreo.setAppKey(TEMBOO_APP_KEY);
+
+  Serial.println("Credentials set");
+
+  time_t t = now();
+  String timeData = (String) month(t) + 
+                    "-" + 
+                    (String) day(t) + 
+                    "-" + 
+                    (String) year(t) + 
+                    " " + 
+                    (String) hour(t) + 
+                    ":" + 
+                    (String) minute(t);
+
+  String values = "[[\"" + timeData + "\", \"" + data + "\"]]";
+
+  Serial.println("values: " + values);
+  
+  // Set Choreo inputs
+  AppendValuesChoreo.addInput("RefreshToken", REFRESH_TOKEN);
+  AppendValuesChoreo.addInput("ClientSecret", CLIENT_SECRET);
+  AppendValuesChoreo.addInput("Values", values);
+  AppendValuesChoreo.addInput("ClientID", CLIENT_ID);
+  AppendValuesChoreo.addInput("SpreadsheetID", SPREADSHEET_ID);
+  
+  // Identify the Choreo to run
+  AppendValuesChoreo.setChoreo("/Library/Google/Sheets/AppendValues");
+
+  Serial.println("Choreo values set");
+  
+  // Run the Choreo;
+  unsigned int returnCode = AppendValuesChoreo.run();
+
+  Serial.println("Choreo ran");
+
+  if (returnCode == 0){
+    Serial.println("Sucess!");
+  } else {
+    while (AppendValuesChoreo.available()){
+      char c = AppendValuesChoreo.read();
+      Serial.print(c);
+    }    
+  }
+  
+  AppendValuesChoreo.close();
+}
 
 void setup() {
   Serial.begin(9600);
