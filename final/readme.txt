@@ -6,6 +6,7 @@ Wire up the 2 ultrasonic sensors.
   
 Camera setup
   Take picture. Send it to google drive via Temboo/Blynk
+    -Once the picture functionality is working, we can potentially add a live feed via camera that can be sent to the phone
   
 Car
   Solder core components onto the car
